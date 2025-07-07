@@ -1,29 +1,20 @@
-import os
-import json
-import requests
-from flask import Flask, request
-from telegram import Bot
 
-app = Flask(__name__)
+import os
+import httpx
+import asyncio
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
-CHAT_ID = os.environ.get("CHAT_ID")
+BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-bot = Bot(token=BOT_TOKEN)
+async def send_message(chat_id, text):
+    url = f"{BASE_URL}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": text
+    }
+    async with httpx.AsyncClient() as client:
+        await client.post(url, json=payload)
 
-@app.route("/", methods=["GET"])
-def index():
-    return "Tesla Proxy Aktif!"
-
-@app.route("/notify", methods=["POST"])
-def notify():
-    data = request.get_json()
-    try:
-        message = f"Yeni Araç Bulundu!\nModel: {data['model']}\nRenk: {data['color']}\nFiyat: {data['price']}"
-        bot.send_message(chat_id=CHAT_ID, text=message)
-        return "OK", 200
-    except Exception as e:
-        return str(e), 400
-
+# Test mesajı
 if __name__ == "__main__":
-    app.run()
+    asyncio.run(send_message("@slymnoz", "🚗 Test: Model Y SR (Siyah İç) Tesla envantere eklendi!"))
