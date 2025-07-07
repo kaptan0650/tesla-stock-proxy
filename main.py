@@ -1,4 +1,4 @@
-
+# Deploy tetikleme - tarih: 07.07.2025
 import os
 import httpx
 import asyncio
